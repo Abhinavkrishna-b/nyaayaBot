@@ -28,8 +28,6 @@ def main():
 def query_rag(query_text: str):
     # Prepare the DB
     embedding_function = get_embedding_function()
-    # Address Chroma deprecation warning (optional for now, but good practice)
-    # from langchain_chroma import Chroma # Already at top
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
 
     # Search the DB
