@@ -1,95 +1,131 @@
-// frontend/src/App.js
-import React, { useState, useEffect } from 'react';
-import Chatbot from './components/chatBot';
-import Sidebar from './components/sideBar';
-import '../src/cssFiles/App.css';
+import { useState, useRef } from 'react';
+import './cssFiles/App.css';
+
+import { translations } from './components/translations';
+import { ThemeToggle } from './components/themeToggler';
+import { Header } from './components/header';
+import { LanguageSelector } from './components/languageSelector';
+import { SuggestionChips } from './components/suggestionChip';
+import { ChatInput } from './components/chatInput';
+import { Loader } from './components/loader';
+import { ChatResponse } from './components/chatResponse';
+import { FloatingActionButtons } from './components/floatingActionButtons';
 
 function App() {
-    const [conversations, setConversations] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [currentQuery, setCurrentQuery] = useState('');
+  const containerRef = useRef(null);
 
-    const [activeConversationId, setActiveConversationId] = useState(null);
+  const handleLanguageChange = (language) => {
+    setSelectedLanguage(language);
+  };
 
-    const activeConversation = conversations.find(
-        (conv) => conv.id === activeConversationId
-    );
-    const activeMessages = activeConversation ? activeConversation.messages : [];
-    const activeConversationTitle = activeConversation ? activeConversation.title : 'New Chat';
+  const handleSuggestionClick = (query) => {
+    setCurrentQuery(query);
+    performSearch(query);
+  };
 
-    const handleSelectConversation = (id) => {
-        setActiveConversationId(id);
-    };
+  const handleFormSubmit = (query) => {
+    setCurrentQuery('');
+    performSearch(query);
+  };
 
-    const handleNewChat = () => {
-        const newId = `conv-${Date.now()}`;
-        const newConversation = {
-            id: newId,
-            title: 'New Chat',
-            messages: [],
-        };
-        setConversations((prev) => [...prev, newConversation]);
-        setActiveConversationId(newId); 
-    };
+  const performSearch = async (query) => {
+    setIsLoading(true);
 
-    const handleSendMessage = (newMessage) => {
-        setConversations((prevConversations) =>
-            prevConversations.map((conv) => {
-                if (conv.id === activeConversationId) {
-                    const updatedConv = { ...conv, messages: [...conv.messages, newMessage] };
+    try {
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, language: selectedLanguage }),
+      });
 
-                    if (conv.title === 'New Chat' && newMessage.type === 'user' && conv.messages.length === 0) {
-                        updatedConv.title = newMessage.text.substring(0, 30) + (newMessage.text.length > 30 ? '...' : '');
-                    }
-                    return updatedConv;
-                }
-                return conv;
-            })
-        );
-    };
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-    const handleEditConversation = (id, newTitle) => {
-        setConversations((prev) =>
-            prev.map((conv) => (conv.id === id ? { ...conv, title: newTitle } : conv))
-        );
-    };
+      const data = await response.json();
 
-    const handleDeleteConversation = (id) => {
-        setConversations((prev) => {
-            const updatedConversations = prev.filter((conv) => conv.id !== id);
-            if (activeConversationId === id) {
-                setActiveConversationId(updatedConversations[0]?.id || null);
-            }
-            return updatedConversations;
-        });
-    };
+      const newMessage = {
+        query,
+        answer: data.answer,
+        timestamp: Date.now(),
+      };
 
-    useEffect(() => {
-        if (conversations.length === 0 && activeConversationId === null) {
-            handleNewChat();
+      setChatMessages((prev) => [...prev, newMessage]);
+
+      setTimeout(() => {
+        const resultsContainer = document.getElementById('results-container');
+        if (resultsContainer) {
+          resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-    }, [conversations, activeConversationId]);
+      }, 100);
+    } catch (error) {
+      const errorMessage = {
+        query,
+        answer: '❌ An error occurred. Please check the server connection and try again.',
+        timestamp: Date.now(),
+      };
+      setChatMessages((prev) => [...prev, errorMessage]);
+      console.error('Search Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  const handleClearChat = () => {
+    setChatMessages([]);
+    setCurrentQuery('');
+    const input = document.getElementById('query-input');
+    if (input) input.focus();
+  };
 
-    return (
-        <div className="app-container">
-            <Sidebar
-                conversations={conversations}
-                activeConversationId={activeConversationId}
-                onSelectConversation={handleSelectConversation}
-                onNewChat={handleNewChat}
-                onEditConversation={handleEditConversation}
-                onDeleteConversation={handleDeleteConversation}
-            />
+  const handleScrollToTop = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
-            <main className="main-content">
-                <Chatbot
-                    messages={activeMessages}
-                    onSendMessage={handleSendMessage}
-                    activeConversationTitle={activeConversationTitle}
-                    hasConversations={conversations.length > 0} 
-                />
-            </main>
+  const currentTranslation = translations[selectedLanguage];
+
+  return (
+    <>
+
+      <div className="container" ref={containerRef}>
+        <ThemeToggle />
+        <Header translation={currentTranslation} />
+
+        <div id="controls-container">
+          <LanguageSelector
+            selectedLanguage={selectedLanguage}
+            onLanguageChange={handleLanguageChange}
+          />
+          <SuggestionChips
+            translation={currentTranslation}
+            onSuggestionClick={handleSuggestionClick}
+          />
+          <ChatInput
+            translation={currentTranslation}
+            onSubmit={handleFormSubmit}
+            isLoading={isLoading}
+            initialQuery={currentQuery}
+          />
         </div>
-    );
+
+        <div id="results-container">
+          {isLoading && <Loader />}
+          {chatMessages.map((message, index) => (
+            <ChatResponse key={index} answer={message.answer} />
+          ))}
+        </div>
+      </div>
+
+      <FloatingActionButtons
+        onClearChat={handleClearChat}
+        onScrollToTop={handleScrollToTop}
+      />
+    </>
+  );
 }
 
 export default App;

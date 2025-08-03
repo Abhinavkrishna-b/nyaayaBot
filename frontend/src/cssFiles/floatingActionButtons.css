@@ -1,0 +1,42 @@
+
+.fab-container { 
+  position: fixed; 
+  bottom: 30px; 
+  right: 30px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 15px; 
+  z-index: 100; 
+}
+
+.fab { 
+  width: 56px; 
+  height: 56px; 
+  border-radius: 50%; 
+  border: none; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); 
+  backdrop-filter: blur(10px); 
+}
+
+.fab:hover { 
+  transform: scale(1.1); 
+}
+
+.clear-fab { 
+  background: linear-gradient(135deg, var(--warning-amber), #fbbf24); 
+}
+
+.scroll-fab { 
+  background: linear-gradient(135deg, var(--navy-blue), #3b82f6); 
+}
+
+.fab svg { 
+  width: 24px; 
+  height: 24px; 
+  fill: white; 
+}
+

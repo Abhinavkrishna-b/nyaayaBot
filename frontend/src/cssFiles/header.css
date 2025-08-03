@@ -1,0 +1,22 @@
+
+.header-section { 
+  text-align: center; 
+  margin-bottom: 40px; 
+}
+
+.header-subtitle { 
+  color: var(--text-color); 
+  font-size: 1.1rem; 
+  opacity: 0.8; 
+  margin-bottom: 20px; 
+  font-weight: 400; 
+}
+
+.header-underline { 
+  width: 120px; 
+  height: 4px; 
+  background: linear-gradient(90deg, var(--saffron), var(--green)); 
+  margin: 0 auto; 
+  border-radius: 2px; 
+  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.3); 
+}

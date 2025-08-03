@@ -1,0 +1,35 @@
+
+.suggestions-container { 
+  margin-bottom: 20px; 
+}
+
+.suggestions-title { 
+  font-size: 0.9rem; 
+  font-weight: 600; 
+  margin-bottom: 10px; 
+  color: var(--text-color); 
+  opacity: 0.8; 
+}
+
+.suggestions-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+  gap: 10px; 
+}
+
+.suggestion-chip { 
+  background: var(--glass-bg); 
+  border: 1px solid var(--glass-border); 
+  padding: 10px 15px; 
+  border-radius: 20px; 
+  font-size: 0.85rem; 
+  cursor: pointer; 
+  text-align: center; 
+  backdrop-filter: blur(10px); 
+}
+
+.suggestion-chip:hover { 
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 15px rgba(255, 153, 51, 0.2); 
+  border-color: var(--saffron); 
+}
