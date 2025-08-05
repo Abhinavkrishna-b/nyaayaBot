@@ -1,3 +1,5 @@
+// In frontend/src/App.jsx
+
 import { useState, useRef } from 'react';
 import './cssFiles/App.css';
 
@@ -10,6 +12,8 @@ import { ChatInput } from './components/chatInput';
 import { Loader } from './components/loader';
 import { ChatResponse } from './components/chatResponse';
 import { FloatingActionButtons } from './components/floatingActionButtons';
+
+const API_URL = 'http://localhost:8000/api/query';
 
 function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
@@ -33,43 +37,63 @@ function App() {
   };
 
   const performSearch = async (query) => {
+    if (!query.trim()) return;
+
     setIsLoading(true);
 
+    const userMessage = {
+      isUser: true,
+      query: query,
+      timestamp: Date.now(),
+    };
+    setChatMessages((prev) => [...prev, userMessage]);
+
+    setTimeout(() => {
+        const resultsContainer = document.getElementById('results-container');
+        if (resultsContainer) {
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+        }
+    }, 100);
+
+
     try {
-      const response = await fetch('/ask', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, language: selectedLanguage }),
+        body: JSON.stringify({ query_text: query }),
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
-      const newMessage = {
-        query,
-        answer: data.answer,
+      const botMessage = {
+        isUser: false,
+        answer: data.response,
+        sources: data.sources,
         timestamp: Date.now(),
       };
 
-      setChatMessages((prev) => [...prev, newMessage]);
+      setChatMessages((prev) => [...prev, botMessage]);
 
-      setTimeout(() => {
-        const resultsContainer = document.getElementById('results-container');
-        if (resultsContainer) {
-          resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
     } catch (error) {
       const errorMessage = {
-        query,
-        answer: '❌ An error occurred. Please check the server connection and try again.',
+        isUser: false,
+        answer: '❌ An error occurred. Please check the backend server connection and try again.',
         timestamp: Date.now(),
       };
       setChatMessages((prev) => [...prev, errorMessage]);
       console.error('Search Error:', error);
     } finally {
       setIsLoading(false);
+      setTimeout(() => {
+        const resultsContainer = document.getElementById('results-container');
+        if (resultsContainer) {
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+        }
+      }, 100);
     }
   };
 
@@ -81,8 +105,9 @@ function App() {
   };
 
   const handleScrollToTop = () => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    const resultsContainer = document.getElementById('results-container');
+    if (resultsContainer) {
+        resultsContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -90,7 +115,6 @@ function App() {
 
   return (
     <>
-
       <div className="container" ref={containerRef}>
         <ThemeToggle />
         <Header translation={currentTranslation} />
@@ -113,10 +137,16 @@ function App() {
         </div>
 
         <div id="results-container">
-          {isLoading && <Loader />}
           {chatMessages.map((message, index) => (
-            <ChatResponse key={index} answer={message.answer} />
+            <ChatResponse
+              key={index}
+              isUser={message.isUser}
+              query={message.query}
+              answer={message.answer}
+              sources={message.sources}
+            />
           ))}
+          {isLoading && <Loader />}
         </div>
       </div>
 
