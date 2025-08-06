@@ -1,31 +1,32 @@
 :root {
-  --saffron: #FF9933;
-  --white: #FFFFFF;
-  --green: #138808;
+  --saffron: #ffe0b2;
+  --white: #ffffff;
+  --green: #5ee262;
   --navy-blue: #000080;
-  --accent-orange: #ff6b35;
-  --success-green: #10b981;
-  --warning-amber: #f59e0b;
-  
-  /* Light Mode (Default) - Indian Flag Inspired */
-  --bg-color: linear-gradient(180deg, 
-      var(--saffron) 0%, 
-      var(--saffron) 20%, 
-      var(--white) 20%, 
-      var(--white) 80%, 
-      var(--green) 80%, 
+  --accent-orange: #ffad80;
+  --success-green: #34d399;
+  --warning-amber: #fde68a;
+
+  /* Light Mode (Refined) - Indian Flag Inspired, but lighter */
+  --bg-color: linear-gradient(180deg,
+      var(--saffron) 0%,
+      var(--saffron) 20%,
+      var(--white) 20%,
+      var(--white) 80%,
+      var(--green) 80%,
       var(--green) 100%);
-  --card-bg-color: rgba(255, 255, 255, 0.95);
+  --card-bg-color: rgba(255, 255, 255, 0.97);
   --text-color: #1f2937;
   --header-color: var(--navy-blue);
-  --border-color: #e5e7eb;
-  --input-bg-color: #ffffff;
-  --shadow-color: rgba(0, 0, 0, 0.15);
-  --overlay-color: rgba(255, 255, 255, 0.8);
-  --theme-icon-fill: #374151;
-  --glass-bg: rgba(255, 255, 255, 0.25);
-  --glass-border: rgba(255, 255, 255, 0.18);
+  --border-color: #e0e0e0;
+  --input-bg-color: #f9fafb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --overlay-color: rgba(255, 255, 255, 0.9);
+  --theme-icon-fill: #4b5563;
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
+
 
 html {
   scroll-behavior: smooth;

@@ -27,34 +27,15 @@ function App() {
   };
 
   const handleSuggestionClick = (query) => {
+    // Set the query for the input box
     setCurrentQuery(query);
-    performSearch(query);
-  };
-
-  const handleFormSubmit = (query) => {
-    setCurrentQuery('');
-    performSearch(query);
+    // Add user message and call the API
+    handleFormSubmit(query);
   };
 
   const performSearch = async (query) => {
-    if (!query.trim()) return;
-
+    // This function now ONLY handles the API call for the bot's response.
     setIsLoading(true);
-
-    const userMessage = {
-      isUser: true,
-      query: query,
-      timestamp: Date.now(),
-    };
-    setChatMessages((prev) => [...prev, userMessage]);
-
-    setTimeout(() => {
-        const resultsContainer = document.getElementById('results-container');
-        if (resultsContainer) {
-            resultsContainer.scrollTop = resultsContainer.scrollHeight;
-        }
-    }, 100);
-
 
     try {
       const response = await fetch(API_URL, {
@@ -88,6 +69,7 @@ function App() {
       console.error('Search Error:', error);
     } finally {
       setIsLoading(false);
+      // Auto-scroll after the response is received
       setTimeout(() => {
         const resultsContainer = document.getElementById('results-container');
         if (resultsContainer) {
@@ -95,6 +77,32 @@ function App() {
         }
       }, 100);
     }
+  };
+
+  const handleFormSubmit = (query) => {
+    if (!query.trim()) return;
+
+    // 1. Add user's message to the chat list
+    const userMessage = {
+      isUser: true,
+      query: query,
+      timestamp: Date.now(),
+    };
+    setChatMessages((prev) => [...prev, userMessage]);
+
+    // 2. Clear the input box state immediately (this is a key part of the fix)
+    setCurrentQuery('');
+
+    // 3. Call the API to get the bot's response
+    performSearch(query);
+
+    // 4. Auto-scroll to show the user's new message right away
+    setTimeout(() => {
+        const resultsContainer = document.getElementById('results-container');
+        if (resultsContainer) {
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+        }
+    }, 100);
   };
 
   const handleClearChat = () => {
@@ -132,7 +140,7 @@ function App() {
             translation={currentTranslation}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
-            initialQuery={currentQuery}
+            initialQuery={currentQuery} // Pass the query state down
           />
         </div>
 
