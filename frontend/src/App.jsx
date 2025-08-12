@@ -27,9 +27,7 @@ function App() {
   };
 
   const handleSuggestionClick = (query) => {
-    // Set the query for the input box
     setCurrentQuery(query);
-    // Add user message and call the API
     handleFormSubmit(query);
   };
 
