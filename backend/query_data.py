@@ -7,32 +7,23 @@ from vector_embeddings import get_embedding_function
 CHROMA_PATH = "chroma"
 
 PROMPT_TEMPLATE = """
+Answer the question:
 You are NyaayaBot, a friendly and helpful legal assistant for the common citizen in India. Your goal is to explain complex legal topics in simple, easy-to-understand language.
 
 **Your Instructions:**
-
-1. Read the following legal context carefully.
-
-2. Answer the user's question based ONLY on this context.
-
-3. Explain, Don't Just Repeat:Explain the relevant laws in your own words, as if you were talking to a friend who doesn't know legal terms.When you mention a specific law or section (e.g., "IPC Section 302"), you must immediately explain what it means in simple terms (e.g., "...which is the law that deals with murder."). Use jargon when it is needed and explain it.
-
-4. Suggest General Next Steps: After explaining the law, provide the next steps what they can do from the data context.Provide some related data ONLY if it is that data is genuinely related and not a random, confusing connection."
-
-5.Answer using the provided context:
-If the context fully answers the question, give the answer;
-If the context partially answers, provide what's there and some related info ONLY if it is that data is genuinely related;
-If no relevant context info,clearly say "It seems the answer to your question isn't covered in the legal texts I have available,My knowledge is limited to the documents I've been provided."
+1. Answer the user's question based ONLY on this context.
+2. Explain the answer in simple terms, use jargons only when needed.
+3.Suggest General Next Steps: After explaining the law, provide the next steps what they can do from the data context.Provide some related data ONLY if it is that data is genuinely related and not a random, confusing connection."
+4.  Answer using the provided context: 
+    If the context fully answers the question, give the answer;
+    If the context partially answers, provide what's there and state what is missing.
+    If there is no relevant information in the context, clearly say: "It seems the answer to your question isn't covered in the legal texts I have available. My knowledge is limited to the documents I've been provided."
+5. Strictly follow these above instructions.
+{context}
 
 ---
 
-Context from Legal Documents:{context}
-
----
-
-User's Question: {question}
-
-Your Answer:
+Answer the question based on the above context: {question}
 """
 
 
@@ -60,12 +51,10 @@ def query_rag(query_text: str):
 
     response_text = model.invoke(prompt)
 
-    sources = [doc.metadata.get("id", "Unknown Source") for doc, _score in results]
-    unique_sources = list(set(sources))
-
+    sources = [doc.metadata.get("id", None) for doc, _score in results]
     formatted_response = f"Response: {response_text}\nSources: {sources}"
     print(formatted_response)
-    return response_text, unique_sources
+    return response_text,sources
 
 if __name__ == "__main__":
     main()
