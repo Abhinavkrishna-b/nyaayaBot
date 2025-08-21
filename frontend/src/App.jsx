@@ -1,6 +1,4 @@
-// In frontend/src/App.jsx
-
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react'; 
 import './cssFiles/App.css';
 
 import { translations } from './components/translations';
@@ -18,9 +16,24 @@ const API_URL = 'http://localhost:8000/api/query';
 function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLoading, setIsLoading] = useState(false);
-  const [chatMessages, setChatMessages] = useState([]);
+
+  const [chatMessages, setChatMessages] = useState(() => {
+    try {
+      const savedMessages = localStorage.getItem('nyaayaBotChatHistory');
+      return savedMessages ? JSON.parse(savedMessages) : [];
+    } catch (error) {
+      console.error("Failed to parse chat history from localStorage", error);
+      return [];
+    }
+  });
+  
   const [currentQuery, setCurrentQuery] = useState('');
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem('nyaayaBotChatHistory', JSON.stringify(chatMessages));
+  }, [chatMessages]);
+
 
   const handleLanguageChange = (language) => {
     setSelectedLanguage(language);
@@ -32,14 +45,18 @@ function App() {
   };
 
   const performSearch = async (query) => {
-    // This function now ONLY handles the API call for the bot's response.
     setIsLoading(true);
+
+    const recentMessages = chatMessages.slice(-6);
 
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query_text: query }),
+        body: JSON.stringify({
+          query_text: query,
+          chat_history: recentMessages,
+        }),
       });
 
       if (!response.ok) {
@@ -67,11 +84,10 @@ function App() {
       console.error('Search Error:', error);
     } finally {
       setIsLoading(false);
-      // Auto-scroll after the response is received
       setTimeout(() => {
         const resultsContainer = document.getElementById('results-container');
         if (resultsContainer) {
-            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+          resultsContainer.scrollTop = resultsContainer.scrollHeight;
         }
       }, 100);
     }
@@ -80,32 +96,27 @@ function App() {
   const handleFormSubmit = (query) => {
     if (!query.trim()) return;
 
-    // 1. Add user's message to the chat list
     const userMessage = {
       isUser: true,
       query: query,
       timestamp: Date.now(),
     };
     setChatMessages((prev) => [...prev, userMessage]);
-
-    // 2. Clear the input box state immediately (this is a key part of the fix)
     setCurrentQuery('');
-
-    // 3. Call the API to get the bot's response
     performSearch(query);
 
-    // 4. Auto-scroll to show the user's new message right away
     setTimeout(() => {
-        const resultsContainer = document.getElementById('results-container');
-        if (resultsContainer) {
-            resultsContainer.scrollTop = resultsContainer.scrollHeight;
-        }
+      const resultsContainer = document.getElementById('results-container');
+      if (resultsContainer) {
+        resultsContainer.scrollTop = resultsContainer.scrollHeight;
+      }
     }, 100);
   };
 
   const handleClearChat = () => {
     setChatMessages([]);
     setCurrentQuery('');
+    localStorage.removeItem('nyaayaBotChatHistory'); 
     const input = document.getElementById('query-input');
     if (input) input.focus();
   };
@@ -113,7 +124,7 @@ function App() {
   const handleScrollToTop = () => {
     const resultsContainer = document.getElementById('results-container');
     if (resultsContainer) {
-        resultsContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      resultsContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -138,14 +149,14 @@ function App() {
             translation={currentTranslation}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
-            initialQuery={currentQuery} // Pass the query state down
+            initialQuery={currentQuery}
           />
         </div>
 
         <div id="results-container">
-          {chatMessages.map((message, index) => (
+          {chatMessages.map((message) => (
             <ChatResponse
-              key={index}
+              key={message.timestamp} 
               isUser={message.isUser}
               query={message.query}
               answer={message.answer}

@@ -4,6 +4,7 @@ import asyncio
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List, Dict, Any, Optional 
 
 from query_data import query_rag
 
@@ -26,11 +27,15 @@ app.add_middleware(
 
 class QueryRequest(BaseModel):
     query_text: str
+    chat_history: Optional[List[Dict[str, Any]]] = None
+
 
 @app.post("/api/query")
 async def process_query(request: QueryRequest):
     try:
-        response_text, sources = await asyncio.to_thread(query_rag, request.query_text)
+        response_text, sources = await asyncio.to_thread(
+            query_rag, request.query_text, request.chat_history
+        )
 
         advice = "\n\n---\nNext Steps: For specific advice on your situation or to take action, consider contacting a qualified lawyer or the relevant government authority."
         full_response = response_text + advice if response_text else advice
