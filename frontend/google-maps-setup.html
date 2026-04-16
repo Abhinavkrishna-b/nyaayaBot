@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps API Setup Instructions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .feature-list {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .feature-list h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        ul {
+            color: #555;
+        }
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Legal Clinic Finder - Google Maps Setup</h1>
+        
+        <div class="feature-list">
+            <h3>✨ Features Implemented:</h3>
+            <ul>
+                <li><strong>📍 Location-based clinic finder</strong> - Uses geolocation to find user's current position</li>
+                <li><strong>🗺️ Interactive Google Maps</strong> - Shows user location and nearby legal clinics</li>
+                <li><strong>📏 Distance calculation</strong> - Calculates and displays distance to each clinic</li>
+                <li><strong>📞 Contact integration</strong> - Direct calling, emailing, and directions</li>
+                <li><strong>⭐ Clinic ratings</strong> - Shows ratings and specializations</li>
+                <li><strong>🔍 Professional design</strong> - Responsive and user-friendly interface</li>
+                <li><strong>🌐 Multi-language support</strong> - Fully integrated with your translation system</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Important:</strong> To enable Google Maps functionality, you need to set up a Google Maps API key. Follow the steps below.
+        </div>
+
+        <div class="step">
+            <h3>Step 1: Get Google Maps API Key</h3>
+            <p>1. Go to the <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></p>
+            <p>2. Create a new project or select an existing one</p>
+            <p>3. Enable the following APIs:</p>
+            <ul>
+                <li>Maps JavaScript API</li>
+                <li>Places API</li>
+                <li>Geolocation API</li>
+            </ul>
+            <p>4. Create credentials (API Key)</p>
+            <p>5. Restrict the API key to your domain for security</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Add API Key to Project</h3>
+            <p>In your <code>LegalClinicFinder.js</code> file, replace this line:</p>
+            <code>script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places`;</code>
+            <p>With your actual API key:</p>
+            <code>script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_ACTUAL_API_KEY&libraries=places`;</code>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Test the Feature</h3>
+            <p>1. Save your changes and restart the development server</p>
+            <p>2. Click on "Find Clinics" in the Legal Aid Services section</p>
+            <p>3. Allow location access when prompted</p>
+            <p>4. View nearby legal clinics on the map and in the list</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Customize Clinic Data</h3>
+            <p>The current implementation uses sample data. In production, you would:</p>
+            <ul>
+                <li>Connect to a real database of legal clinics</li>
+                <li>Use Google Places API to find actual legal services</li>
+                <li>Implement user reviews and ratings</li>
+                <li>Add filtering by specialization</li>
+            </ul>
+        </div>
+
+        <h2>🚀 How to Access the Feature</h2>
+        <p>1. Navigate to your website at <code>http://localhost:3002</code></p>
+        <p>2. Scroll to the "Legal Aid Services" section</p>
+        <p>3. Click on the "Local Legal Clinics" card</p>
+        <p>4. Click "Enable Location" to start finding nearby clinics</p>
+
+        <div class="warning">
+            <strong>Note:</strong> Without the Google Maps API key, the map won't load, but the location detection and clinic listing will still work with sample data.
+        </div>
+    </div>
+</body>
+</html>
